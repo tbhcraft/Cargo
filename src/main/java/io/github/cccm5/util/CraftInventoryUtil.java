@@ -1,10 +1,7 @@
-package io.github.cccm5;
+package io.github.cccm5.util;
 
-import net.citizensnpcs.api.npc.NPC;
-import net.citizensnpcs.api.npc.NPCRegistry;
-import net.citizensnpcs.api.trait.Trait;
-import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.MovecraftLocation;
+import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.util.hitboxes.HitBox;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,30 +13,28 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class Utils
-{
+public class CraftInventoryUtil {
     private static final Material[] INVENTORY_MATERIALS = new Material[]{Material.CHEST, Material.TRAPPED_CHEST, Material.FURNACE, Material.HOPPER, Material.DROPPER, Material.DISPENSER, Material.BREWING_STAND, Material.BARREL};
 
     /**
      * Converts a movecraftLocation Object to a bukkit Location Object
-     * 
+     *
      * @param movecraftLoc the movecraft location to be converted
      * @param world the world of the location
      * @return the converted location
      */
-    public static Location movecraftLocationToBukkitLocation(MovecraftLocation movecraftLoc, World world){
+    private static Location movecraftLocationToBukkitLocation(MovecraftLocation movecraftLoc, World world){
         return new Location(world,movecraftLoc.getX(),movecraftLoc.getY(),movecraftLoc.getZ());
     }
 
     /**
      * Converts a list of movecraftLocation Object to a bukkit Location Object
-     * 
+     *
      * @param movecraftLocations the movecraftLocations to be converted
      * @param world the world of the location
      * @return the converted location
      */
-    public static ArrayList<Location> movecraftLocationToBukkitLocation(HitBox movecraftLocations, World world){
+    private static ArrayList<Location> movecraftLocationToBukkitLocation(HitBox movecraftLocations, World world){
         ArrayList<Location> locations = new ArrayList<>();
         for(MovecraftLocation movecraftLoc : movecraftLocations){
             locations.add(movecraftLocationToBukkitLocation(movecraftLoc,world));
@@ -47,19 +42,10 @@ public class Utils
         return locations;
     }
 
-    public static ArrayList<NPC> getNPCsWithTrait(Class<? extends Trait> c){
-        ArrayList<NPC> npcs = new ArrayList<>();
-        for(NPCRegistry registry : net.citizensnpcs.api.CitizensAPI.getNPCRegistries())
-            for(NPC npc : registry)
-                if(npc.hasTrait(c))
-                    npcs.add(npc);
-        return npcs;
-    }
-
     /**
      * Gets the first inventory of a lookup material type on a craft holding a specific item, returns null if none found
      * an input of null for item searches without checking inventory contents
-     * 
+     *
      * @param craft the craft to scan
      * @param item the item to look for during the scan
      * @param lookup the materials to compare against while scanning
@@ -111,7 +97,7 @@ public class Utils
      * Gets the first inventory of a lookup material type on a craft holding a specific item, returns null if none found
      * an input of null for item searches without checking inventory contents
      * an input of an ItemStack with type set to Material.AIR for searches for empty space in an inventory
-     * 
+     *
      * @param craft the craft to scan
      * @param item the item to look for during the scan
      * @param lookup the materials to compare against while scanning
@@ -129,7 +115,7 @@ public class Utils
         }
         if(craft == null)
             throw new IllegalArgumentException("craft must not be null");
-        ArrayList<Inventory> invs = new ArrayList<Inventory>();	
+        ArrayList<Inventory> invs = new ArrayList<Inventory>();
         for(Location loc : movecraftLocationToBukkitLocation(craft.getHitBox(),craft.getWorld()))
             for(Material m : lookup){
                 boolean foundStack=false;
@@ -152,7 +138,4 @@ public class Utils
             }
         return invs;
     }
-    
-    
-
 }
