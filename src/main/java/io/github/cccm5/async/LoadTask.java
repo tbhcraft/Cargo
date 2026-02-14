@@ -6,6 +6,7 @@ import io.github.cccm5.config.Config;
 import io.github.cccm5.util.CraftInventoryUtil;
 import net.countercraft.movecraft.craft.PlayerCraft;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -29,6 +30,21 @@ public class LoadTask extends CargoTask {
                 int maxCount = (inv.getItem(i) == null || inv.getItem(i).getType() == Material.AIR)
                         ? item.getMainItem().getMaxStackSize()
                         : inv.getItem(i).getMaxStackSize() - inv.getItem(i).getAmount();
+                if(item.hasTradeLimit())
+                {
+                    int itemsTraded = CargoMain.getInstance().getDtlTradersPlugin().getTradeLimitService().getLimits(originalPilot).getItemTradeAmount(item.getID());
+                    int leftToSell = item.getTradeLimit() - itemsTraded;
+                    if (leftToSell < 1) {
+                        this.cancel();
+                        CargoMain.getQue().remove(originalPilot);
+                        originalPilot.sendMessage(Config.SUCCESS_TAG + "Purchase limit reached");
+                        originalPilot.sendMessage(Config.SUCCESS_TAG + "Loaded " + loaded + " items worth $"
+                                + String.format("%.2f", loaded * item.getTradePrice()) + " took a tax of "
+                                + String.format("%.2f", Config.loadTax * loaded * item.getTradePrice()));
+                        return;
+                    }
+                    CargoMain.getInstance().getDtlTradersPlugin().getTradeLimitService().getLimits(originalPilot).addItemTradeAmount(item.getID(), 1);
+                }
                 if (CargoMain.getEconomy().getBalance(originalPilot) > item.getTradePrice() * maxCount
                         * (1 + Config.loadTax)) {
                     loaded += maxCount;

@@ -142,6 +142,10 @@ public class CargoMain extends JavaPlugin implements Listener {
         return instance;
     }
 
+    public static Main getDtlTradersPlugin(){
+        return dtlTradersPlugin;
+    }
+
     public void unload(@NotNull Player player){
         if (!player.hasPermission("Cargo.unload")) {
             player.sendMessage(Config.ERROR_TAG + "You don't have permission to do that!");
@@ -243,6 +247,11 @@ public class CargoMain extends JavaPlugin implements Listener {
         String itemName = finalItem.getMainItem().getItemMeta().getDisplayName() != null && finalItem.getMainItem().getItemMeta().getDisplayName().length() > 0 ? finalItem.getMainItem().getItemMeta().getDisplayName() : finalItem.getMainItem().getType().name().toLowerCase();
         if(!economy.has(player,finalItem.getTradePrice()*(1+Config.loadTax))){
             player.sendMessage(Config.ERROR_TAG + "You don't have enough money to buy any " + itemName + ChatColor.RESET + "!");
+            return;
+        }
+
+        if(finalItem.getTradeLimit() - dtlTradersPlugin.getTradeLimitService().getLimits(player).getItemTradeAmount(finalItem.getID()) < 1){
+            player.sendMessage(Config.ERROR_TAG + "You reached they daily purchase limit of " + itemName + ChatColor.RESET + "!");
             return;
         }
 

@@ -3,9 +3,12 @@ package io.github.cccm5.util;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.util.hitboxes.HitBox;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -66,12 +69,23 @@ public class CraftInventoryUtil {
         if(item.getType() == Material.AIR)
             throw new IllegalArgumentException("item must not have type Material.AIR");
         ArrayList<Inventory> invs = new ArrayList<Inventory>();
+        ArrayList<Location> dbLoc = new ArrayList<>();
         for(Location loc : movecraftLocationToBukkitLocation(craft.getHitBox(),craft.getWorld()))
             for(Material m : lookup){
                 boolean foundStack=false;
                 if(loc.getBlock().getType() == m)
                 {
                     Inventory inv = ((InventoryHolder)loc.getBlock().getState()).getInventory();
+                    if(inv instanceof DoubleChestInventory)
+                    {
+                        DoubleChestInventory dbi = (DoubleChestInventory) inv;
+                        if(dbLoc.contains(dbi.getLeftSide().getLocation()) || dbLoc.contains(dbi.getRightSide().getLocation()))
+                        {
+                            break;
+                        }
+                        dbLoc.add(dbi.getLeftSide().getLocation());
+                        dbLoc.add(dbi.getRightSide().getLocation());
+                    }
                     if(item==null){
                         if (!invs.contains(inv)) {
                             invs.add(inv);
