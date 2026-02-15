@@ -25,6 +25,7 @@ import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.craft.PlayerCraft;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
@@ -173,6 +174,7 @@ public class CargoMain extends JavaPlugin implements Listener {
         }
 
         Set<TradableGUIItem> items = NPCUtil.getItems(nearbyMerchants, player.getInventory().getItemInMainHand(), dtlTradersPlugin, "sell");
+        Bukkit.getLogger().info("Items detected on /unload: " + items.toString());
         TradableGUIItem finalItem = null;
         for (TradableGUIItem item : items) {
             if (finalItem == null) {
@@ -183,7 +185,11 @@ public class CargoMain extends JavaPlugin implements Listener {
             if (item.getTradePrice() > finalItem.getTradePrice())
                 finalItem = item;
         }
+        Bukkit.getLogger().info("Final item null: " + (finalItem == null));
         if (finalItem == null || finalItem.getTradePrice() <= 0.0) {
+            Bukkit.getLogger().info("Fail condition triggered for holding cargo item");
+            if(finalItem != null)
+                Bukkit.getLogger().info("Final item trade price: " + finalItem.getTradePrice());
             player.sendMessage(Config.ERROR_TAG + "You need to be holding a cargo item to do that!");
             return;
         }
