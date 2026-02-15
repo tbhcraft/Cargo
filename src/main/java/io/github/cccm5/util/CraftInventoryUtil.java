@@ -119,6 +119,7 @@ public class CraftInventoryUtil {
      */
     public static List<Inventory> getInventories(Craft craft, ItemStack item, Material... lookup){
         boolean test=false;
+        ArrayList<Location> dbLoc = new ArrayList<>();
         for(Material m : lookup){
             for(Material compare : INVENTORY_MATERIALS)
                 if(compare == m){
@@ -136,6 +137,16 @@ public class CraftInventoryUtil {
                 if(loc.getBlock().getType() == m)
                 {
                     Inventory inv = ((InventoryHolder)loc.getBlock().getState()).getInventory();
+                    if(inv instanceof DoubleChestInventory)
+                    {
+                        DoubleChestInventory dbi = (DoubleChestInventory) inv;
+                        if(dbLoc.contains(dbi.getLeftSide().getLocation()) || dbLoc.contains(dbi.getRightSide().getLocation()))
+                        {
+                            break;
+                        }
+                        dbLoc.add(dbi.getLeftSide().getLocation());
+                        dbLoc.add(dbi.getRightSide().getLocation());
+                    }
                     if(item==null){
                         invs.add(inv);
                         break;
