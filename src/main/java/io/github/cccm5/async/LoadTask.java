@@ -33,17 +33,22 @@ public class LoadTask extends CargoTask {
                 if(item.hasTradeLimit())
                 {
                     int itemsTraded = CargoMain.getInstance().getDtlTradersPlugin().getTradeLimitService().getLimits(originalPilot).getItemTradeAmount(item.getID());
-                    int leftToSell = item.getTradeLimit() - itemsTraded;
-                    if (leftToSell < 1) {
-                        this.cancel();
-                        CargoMain.getQue().remove(originalPilot);
-                        originalPilot.sendMessage(Config.SUCCESS_TAG + "Purchase limit reached");
-                        originalPilot.sendMessage(Config.SUCCESS_TAG + "Loaded " + loaded + " items worth $"
-                                + String.format("%.2f", loaded * item.getTradePrice()) + " took a tax of "
-                                + String.format("%.2f", Config.loadTax * loaded * item.getTradePrice()));
-                        return;
+                    int totalLimitAfterSell = itemsTraded + maxCount;
+                    if (totalLimitAfterSell > item.getTradeLimit()) {
+                        int leftToSell = item.getTradeLimit() - itemsTraded;
+                        maxCount = leftToSell;
+                        if(leftToSell == 0)
+                        {
+                            this.cancel();
+                            CargoMain.getQue().remove(originalPilot);
+                            originalPilot.sendMessage(Config.SUCCESS_TAG + "Purchase limit reached");
+                            originalPilot.sendMessage(Config.SUCCESS_TAG + "Loaded " + loaded + " items worth $"
+                                    + String.format("%.2f", loaded * item.getTradePrice()) + " took a tax of "
+                                    + String.format("%.2f", Config.loadTax * loaded * item.getTradePrice()));
+                            return;
+                        }
                     }
-                    CargoMain.getInstance().getDtlTradersPlugin().getTradeLimitService().getLimits(originalPilot).addItemTradeAmount(item.getID(), 1);
+                    CargoMain.getInstance().getDtlTradersPlugin().getTradeLimitService().getLimits(originalPilot).addItemTradeAmount(item.getID(), maxCount);
                 }
                 if (CargoMain.getEconomy().getBalance(originalPilot) > item.getTradePrice() * maxCount
                         * (1 + Config.loadTax)) {
