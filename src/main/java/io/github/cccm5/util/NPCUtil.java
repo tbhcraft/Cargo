@@ -15,6 +15,7 @@ import net.citizensnpcs.api.npc.NPCRegistry;
 import net.citizensnpcs.api.trait.Trait;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.util.MathUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,15 +72,20 @@ public class NPCUtil {
         for (NPC merchant : merchants) {
             String guiName = merchant.getTrait(TraderTrait.class).getGUIName();
             AGUI gui = dtlTradersPlugin.getGuiListService().getGUI(guiName);
-            if (!(gui instanceof TradeGUI))
-                continue;
+            if (!(gui instanceof TradeGUI)){
+                Bukkit.getLogger().info("Failed at comparing trade gui");
+                continue;}
 
             for (TradeGUIPage page : ((TradeGUI) gui).getPages()) {
                 for (AGUIItem guiItem : page.getItems(shopMode)) {
-                    if (!(guiItem instanceof TradableGUIItem tradableItem))
+                    if (!(guiItem instanceof TradableGUIItem tradableItem)){
+                        Bukkit.getLogger().info("Failed at comparing trade item");
+                        continue;}
+                    if (!guiItem.getMainItem().isSimilar(item) || guiItem.getMainItem().getAmount() > 1){
+                        Bukkit.getLogger().info("Failed at similarity");
                         continue;
-                    if (!guiItem.getMainItem().isSimilar(item) || guiItem.getMainItem().getAmount() > 1)
-                        continue;
+                    }
+
 
                     result.add(tradableItem);
                     if (Config.debug) {
